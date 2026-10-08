@@ -1,0 +1,25 @@
+{
+  "name": "MiSabor - Recetario de Cocina",
+  "short_name": "MiSabor",
+  "description": "Consulta y guarda tus recetas de cocina favoritas para acceder a ellas en cualquier momento.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF8F3",
+  "theme_color": "#7A3516",
+  
+  "icons": [
+    {
+      "src": "/icons/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
