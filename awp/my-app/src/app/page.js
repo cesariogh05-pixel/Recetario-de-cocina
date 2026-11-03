@@ -41,7 +41,7 @@ export default function Home() {
     <main className="flex-1">
       <section className="relative overflow-hidden">
         <Image
-          src="/fondo.jpg"
+          src="/fondonuevo.jpg"
           alt=""
           fill
           priority

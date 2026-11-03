@@ -1,7 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Fraunces, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const titulos = Fraunces({
   variable: "--font-titulos",
@@ -14,19 +18,45 @@ const cuerpo = DM_Sans({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Mi Sabor | Recetas caseras",
-  description: "Recetas caseras para compartir en la mesa de siempre.",
-};
-
-const enlaces = [
-  { href: "/", texto: "Inicio" },
-  { href: "/explorar", texto: "Explorar" },
-  { href: "/receta", texto: "Receta" },
-  { href: "/favoritos", texto: "Favoritos", contador: 0 },
-];
+const STORAGE_KEY = "misabor-favoritos";
 
 export default function RootLayout({ children }) {
+  const [numFavoritos, setNumFavoritos] = useState(0);
+  const pathname = usePathname(); // Detecta cuando cambias de página para actualizar el contador
+
+  useEffect(() => {
+    const actualizarContador = () => {
+      try {
+        const guardados = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (Array.isArray(guardados)) {
+          setNumFavoritos(guardados.length);
+        }
+      } catch {
+        setNumFavoritos(0);
+      }
+    };
+
+    // Cargar al montar
+    actualizarContador();
+
+    // Escuchar cambios en el localStorage (por si se abren pestañas o hay eventos cruzados)
+    window.addEventListener("storage", actualizarContador);
+    
+    // Intervalo corto o evento personalizado opcional para refrescar al navegar entre páginas
+    window.addEventListener("focus", actualizarContador);
+
+    return () => {
+      window.removeEventListener("storage", actualizarContador);
+      window.removeEventListener("focus", actualizarContador);
+    };
+  }, [pathname]); // Se vuelve a verificar cada vez que cambias de ruta (ej. de Inicio a Explorar o Favoritos)
+
+  const enlaces = [
+    { href: "/", texto: "Inicio" },
+    { href: "/explorar", texto: "Explorar" },
+    { href: "/favoritos", texto: "Favoritos", contador: numFavoritos },
+  ];
+
   return (
     <html
       lang="es"
@@ -38,7 +68,7 @@ export default function RootLayout({ children }) {
             <Link href="/" className="flex items-center gap-3">
               <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white">
                 <Image
-                  src="/logoo.png"
+                  src="/logonuevo.png"
                   alt="Mi Sabor"
                   width={300}
                   height={300}
@@ -62,7 +92,7 @@ export default function RootLayout({ children }) {
                   {e.texto}
 
                   {e.contador !== undefined && (
-                    <span className="rounded-full bg-[#EBDDC5] px-2 text-xs leading-5">
+                    <span className="rounded-full bg-[#EBDDC5] px-2 text-xs leading-5 font-bold">
                       {e.contador}
                     </span>
                   )}
