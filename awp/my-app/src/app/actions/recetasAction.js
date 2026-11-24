@@ -263,7 +263,43 @@ export async function actualizarRecetaCatalogo(idReceta, datosReceta) {
     data: { user },
     error: errorUsuario,
   } = await supabase.auth.getUser();
+  console.log("ADMIN ACTION USER:", user?.id, "ID RECETA:", idReceta);
+  
 
+  function asegurarArregloJSON(valor) {
+  if (Array.isArray(valor)) {
+    return valor;
+  }
+
+  if (typeof valor === "string") {
+    const limpio = valor.trim();
+    if (!limpio) return [];
+
+    try {
+      const parseado = JSON.parse(limpio);
+      if (Array.isArray(parseado)) return parseado;
+      if (parseado && typeof parseado === "object") return [parseado];
+      if (typeof parseado === "string" && parseado.trim()) {
+        return parseado
+          .split("\n")
+          .map((l) => l.trim())
+          .filter(Boolean);
+      }
+      return [];
+    } catch {
+      return limpio
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
+    }
+  }
+
+  if (valor && typeof valor === "object") {
+    return [valor];
+  }
+
+  return [];
+}
   if (errorUsuario || !user || !esAdmin(user)) {
     return {
       ok: false,
@@ -271,12 +307,38 @@ export async function actualizarRecetaCatalogo(idReceta, datosReceta) {
     };
   }
 
-  const { data, error } = await supabase
-    .from("recetas")
-    .update(datosReceta)
-    .eq("id_receta", idReceta)
-    .select()
-    .single();
+  const consejosSeguros = asegurarArregloJSON(datosReceta?.consejos);
+
+  const payload = {
+    nombre: datosReceta.nombre,
+    descripcion: datosReceta.descripcion,
+    id_categoria: datosReceta.id_categoria,
+    tiempo: tiempoATexto(datosReceta.tiempo),
+    porciones: datosReceta.porciones,
+    dificultad: datosReceta.dificultad,
+    imagen: datosReceta.imagen,
+    ingredientes: asegurarArregloJSON(datosReceta.ingredientes),
+    instrucciones: asegurarArregloJSON(datosReceta.instrucciones),
+    consejos: Array.isArray(consejosSeguros) ? consejosSeguros : [],
+  };
+
+  console.log(
+  "CONSEJOS RECIBIDOS:",
+  typeof datosReceta?.consejos,
+  datosReceta?.consejos
+);
+console.log(
+  "CONSEJOS EN PAYLOAD:",
+  Array.isArray(payload.consejos),
+  payload.consejos
+);
+
+const { data, error } = await supabase
+  .from("recetas")
+  .update(payload)
+  .eq("id_receta", idReceta)
+  .select()
+  .single();
 
   if (error) {
     console.error("Error al actualizar receta de catálogo:", error.message);

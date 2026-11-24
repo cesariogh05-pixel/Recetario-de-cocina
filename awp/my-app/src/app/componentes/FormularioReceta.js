@@ -357,7 +357,10 @@ export default function FormularioReceta({
     ? await actualizarRecetaCatalogo(receta.id_receta, datos)
     : await crearRecetaCatalogo(datos)
   : editando
-    ? await actualizarReceta(receta.id_receta, datos)
+    ? await actualizarReceta(
+        receta.id_receta_usuario ?? receta.id_receta,
+        datos
+      )
     : await crearReceta(datos);
 
       if (!respuesta.ok) {

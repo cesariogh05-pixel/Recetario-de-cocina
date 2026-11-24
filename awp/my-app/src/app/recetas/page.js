@@ -423,11 +423,14 @@ export default function Recetas() {
     setFormularioAbierto(true);
   };
 
-  const editarReceta = (receta) => {
-    setModoAdminForm(false);
-    setRecetaEditando(receta);
-    setFormularioAbierto(true);
-  };
+const editarReceta = (receta) => {
+  const editarComoAdmin =
+    soyAdmin && receta.id_usuario !== idUsuario;
+
+  setModoAdminForm(editarComoAdmin);
+  setRecetaEditando(receta);
+  setFormularioAbierto(true);
+};
 
   const cerrarFormulario = () => {
     setFormularioAbierto(false);

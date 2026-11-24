@@ -22,7 +22,6 @@ export function consejosALista(texto) {
 
 // Convierte un ingrediente, paso o consejo en texto simple.
 // En la base de datos pueden estar como texto o como objeto
-// (ej. { cantidad, unidad, nombre } o { titulo, descripcion }).
 export function elementoATexto(item) {
   if (item === null || item === undefined) return "";
   if (typeof item === "string") return item;
